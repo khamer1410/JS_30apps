@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+<script>
+  const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+/* https://www.atatus.com/blog/fetch-api/ - zamiast samego URL można zbudować całe zapytanie (url + obiekt konfigurujący)!
+ var req = new Request('https://api.acme.com/users.json', {
+    method: 'post',
+    mode: 'cors',
+    redirect: 'follow'
+    headers: {
+      "Content-type":
+      "application/x-www-form-urlencoded; charset=UTF-8"
+    },
+    body: 'foo=bar&lorem=ipsum'
+  });*/
+
+
+  const test = fetch(endpoint); //fetch zwraca ogólny promise
+  console.log(test);
+
+  fetch(endpoint).then(blob => console.log(blob))  //nie wiadomo czym jest blob - mp3, img, json?
+
+  const cities = [];
+  fetch(endpoint)
+    .then(function (responseObj) { 
+      console.log('status: ', responseObj.status, responseObj.statusText, responseObj.ok );
+      return responseObj}) //każdy .then przekazuje dalej jako argument swoją zwracaną wartość
+    .then(blob => blob.json())        //można robić chain dla promise
+    // .then(data => cities = data);  //Wiemy, że to  typ danych json = response 'blob' dziedziczy po Response - ma metodę json. 
+    // .then(data => cities.push(data)); //push robi tablicę w tablicy ( dla każdej wartości po przecinku osobną)
+    .then(data => cities.push(...data)); //ES6 - ... dodaje zawartość tablicy
+    
+    function findMatches(wordToMatch, cities) {   //zwraca przefiltrowaną tabliće cities => wybrane elementy, które spełniają warunek => city.match || state.match - match zwraca tablicę
+      return cities.filter(place => {
+        const regx = new RegExp(wordToMatch, 'gi'); //w RegExp za pomocą konstrutora mozemy podać zmienną (przy iterale tylko stąłą wartość). g = wyszukuje globalnie (nie zatrzymuje się po pierwszym) i = case insensitive
+        return place.city.match(regx) || place.state.match(regx); //jeżeli chociaz jeden to cały filter = return true. Znajdzie się w tablicy
+      });
+    }
+
+    function numberWithSpaces(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "); 
+    }
+
+    function displayMatches() {                                 //rozdziel funkcje na wykonujące osobne czynności. Najpierw pobierz dane, potem działaj.
+      const matchArray = findMatches(this.value, cities);       // this.value = searchInput.value (to co nasłuchuje EvList)- zwraca tablicę
+      const html = matchArray.map(place => {
+        const regex = new RegExp(this.value, 'gi');
+        const cityName = place.city.replace(regex, `<span class="hl">${this.value}</span>`); // zapewnia dodanie span z kalsą do wyszukiwanej frazy = można kolorować!
+        const stateName = place.state.replace(regex, `<span class="hl">${this.value}</span>`);
+        return `
+          <li>
+            <span class="name">${cityName}, ${stateName}</span>
+            <span class="population">${numberWithSpaces(place.population)}</span> 
+          </li>
+          `;
+      }).join('');      //Zamiast tablicy dostajesz jeden wielki string
+      suggestions.innerHTML = html;
+    }
+
+  const searchInput = document.querySelector('.search');
+  const suggestions = document.querySelector('.suggestions');
+
+  searchInput.addEventListener('change',displayMatches);
+  searchInput.addEventListener('keyup',displayMatches);
+
+</script>
+  </body>
+</html>
