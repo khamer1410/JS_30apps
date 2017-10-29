@@ -75,8 +75,9 @@
     const newArr = comments.slice(index, index + 1); //tworzy nową tablicę o zadanej długości
     console.table(newArr);
 
-    const newItem = comments.splice(index,1); //wycina liczbę elementów = modyfikują pierwowzór
+    const newItem = comments.splice(index,1); //wycina liczbę elementów = usuwa z (modyfikuje) pierwowzór
     console.table(newItem);
+    console.table(comments);
 
     const addTable = [
       ...comments.slice(0,index),

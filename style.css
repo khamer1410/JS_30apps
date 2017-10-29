@@ -1,5 +1,6 @@
 body {
 	margin: 0 auto;
+	background: #9E9E9E;
 }
 
 .container {
@@ -12,6 +13,18 @@ body {
 
 header {
 	width: 100%;
-	width: 20vh;
+	height: 20vh;
 	background-color: #d35400;
+	text-align: center;
+	overflow: hidden;
+}
+
+.app-window {
+	align-content: center;
+	justify-content: center;
+}
+
+.app-window iframe {
+	width: 80%;
+	height: 60vh;
 }

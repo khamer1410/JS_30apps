@@ -100,9 +100,19 @@
 
 <script>
   const checkboxList = document.querySelectorAll('input');
-  checkboxList.forEach(function(element) {
-    element.addEventListener('click', checkMulti)
-  });
+  // checkboxList.forEach(function(element) {
+  //   element.addEventListener('click', checkMulti)
+  // });
+
+  const inbox = document.querySelector('.inbox'); //test with bubbling - musisz dodać i tak tablicę nodów, żeby potem na nich wykonywać operację. Bubbling może być ogólnym odpaleniem funkcji, która i tak będize bazować na poszczególnych elementach
+  inbox.addEventListener('click', (e)=> {
+    e.stopPropagation();                          //powoduje, że nadrzędne eventy się nie odpalają.
+    let arr = e.path;
+    console.log(arr[0].type);
+    console.log(e);
+    if (arr[0].type === 'checkbox') {checkMulti};
+  })
+
 
 let lastChecked;
 function checkMulti(e) {
